@@ -23,4 +23,12 @@ jobs:
         with:
           path: .
       - id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      # 2026-11-26: deploy-pages sometimes can't see the just-uploaded artifact yet
+      # ("No artifacts named github-pages"); a re-run works, so retry once after a pause.
+      - if: steps.deployment.outcome == 'failure'
+        run: sleep 30
+      - id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
